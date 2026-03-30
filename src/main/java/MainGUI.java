@@ -1,4 +1,3 @@
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -6,6 +5,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.text.ParseException;
 
@@ -33,7 +34,7 @@ public class MainGUI extends JFrame {
     private JTable tabela;
 
     private JTextField txtId, txtNome;
-    private JFormattedTextField txtData; // Alterado para JFormattedTextField
+    private JFormattedTextField txtData; 
     private JComboBox<String> cbAnimal, cbServico;
 
     public MainGUI() {
@@ -48,7 +49,6 @@ public class MainGUI extends JFrame {
 
     private void configurarTema() {
         try {
-
             UIManager.setLookAndFeel("com.formdev.flatlaf.FlatLightLaf");
         } catch (Exception e) {
             try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
@@ -59,13 +59,27 @@ public class MainGUI extends JFrame {
     private void configurarJanela() {
         setTitle("PetShop Pro - Gestão de Agendamentos");
         setSize(1000, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(15, 15));
+        
+        // Remove o fechamento padrão para aplicarmos o salvamento automático
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        
+        // Adiciona evento para salvar os dados automaticamente ao fechar o programa
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    sistema.salvarDados(); // Salva silenciosamente
+                } catch (IOException ex) {
+                    System.err.println("Erro ao salvar dados no encerramento: " + ex.getMessage());
+                }
+                System.exit(0); // Encerra o programa
+            }
+        });
     }
 
     private void inicializarComponentes() {
-
         JPanel painelTopo = new JPanel();
         painelTopo.setBackground(new Color(41, 128, 185));
         JLabel lblTitulo = new JLabel("Sistema de Gerenciamento PetShop");
@@ -74,17 +88,14 @@ public class MainGUI extends JFrame {
         painelTopo.add(lblTitulo);
         add(painelTopo, BorderLayout.NORTH);
 
-
         JPanel painelLateral = new JPanel(new GridBagLayout());
         painelLateral.setBorder(BorderFactory.createTitledBorder("Novo Agendamento"));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 10, 8, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-
         txtId = new JTextField(15);
         txtNome = new JTextField(15);
-
 
         try {
             MaskFormatter mascaraData = new MaskFormatter("##/##/####");
@@ -98,17 +109,16 @@ public class MainGUI extends JFrame {
         cbAnimal = new JComboBox<>(new String[]{"Cachorro", "Gato"});
         cbServico = new JComboBox<>(new String[]{"Banho", "Banho e Tosa"});
 
-
         adicionarCampo(painelLateral, "ID do Registro:", txtId, gbc, 0);
         adicionarCampo(painelLateral, "Nome do Cliente:", txtNome, gbc, 1);
         adicionarCampo(painelLateral, "Tipo de Animal:", cbAnimal, gbc, 2);
         adicionarCampo(painelLateral, "Tipo de Serviço:", cbServico, gbc, 3);
         adicionarCampo(painelLateral, "Data (DD/MM/AAAA):", txtData, gbc, 4);
 
-
         JButton btnCadastrar = new JButton("Confirmar Agendamento");
         btnCadastrar.setBackground(new Color(46, 204, 113));
-        btnCadastrar.setForeground(Color.WHITE);
+        // COR ALTERADA AQUI: De Color.WHITE para Color.BLACK para melhor legibilidade
+        btnCadastrar.setForeground(Color.BLACK); 
         btnCadastrar.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnCadastrar.addActionListener(e -> cadastrar());
 
@@ -117,7 +127,6 @@ public class MainGUI extends JFrame {
         painelLateral.add(btnCadastrar, gbc);
 
         add(painelLateral, BorderLayout.WEST);
-
 
         JPanel painelCentral = new JPanel(new BorderLayout());
         String[] colunas = {"ID", "Cliente", "Animal", "Serviço", "Data", "Valor (R$)"};
@@ -130,7 +139,6 @@ public class MainGUI extends JFrame {
 
         JScrollPane scroll = new JScrollPane(tabela);
         painelCentral.add(scroll, BorderLayout.CENTER);
-
 
         JPanel painelAcoesTabela = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnRemover = new JButton("Remover Selecionado");
@@ -157,16 +165,13 @@ public class MainGUI extends JFrame {
 
     private void cadastrar() {
         try {
-
             if (txtId.getText().trim().isEmpty()) {
                 throw new Exception("O campo ID é obrigatório.");
             }
             int id = Integer.parseInt(txtId.getText().trim());
 
-
             String nome = txtNome.getText().trim();
             if (nome.isEmpty()) throw new Exception("O nome do cliente é obrigatório.");
-
 
             String data = txtData.getText().trim();
             if (data.contains("_")) {
@@ -206,7 +211,7 @@ public class MainGUI extends JFrame {
             sistema.remover(id);
             atualizarTabela();
             JOptionPane.showMessageDialog(this, "Agendamento removido.");
-        } catch (PetshopException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
         }
     }
@@ -232,11 +237,11 @@ public class MainGUI extends JFrame {
     private void limpar() {
         txtId.setText("");
         txtNome.setText("");
-        txtData.setValue(null); // Limpa o campo formatado corretamente
+        txtData.setValue(null); 
         txtId.requestFocus();
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new MainGUI().setVisible(true));
-    }
+    } 
 }
