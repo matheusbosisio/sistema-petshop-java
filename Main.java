@@ -13,7 +13,10 @@ public class Main {
             sistema.carregarDados();
             System.out.println("Dados carregados com sucesso!");
         } catch (IOException e) {
-            System.out.println("Nenhum dado anterior encontrado ou erro ao carregar.");
+            System.out.println("Não foi possível carregar os dados: " + e.getMessage());
+            System.out.println("O arquivo foi preservado. Corrija-o antes de iniciar novamente.");
+            scanner.close();
+            return;
         }
 
         int opcao = 0;
