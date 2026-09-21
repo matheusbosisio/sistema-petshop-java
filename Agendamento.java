@@ -11,12 +11,22 @@ public class Agendamento {
     private double valor;
 
     public Agendamento(int id, String nomeCliente, String tipoAnimal, String tipoServico, String data, double valor) {
+        validarCampo(nomeCliente);
+        validarCampo(tipoAnimal);
+        validarCampo(tipoServico);
+        validarCampo(data);
         this.id = id;
         this.nomeCliente = nomeCliente;
         this.tipoAnimal = tipoAnimal;
         this.tipoServico = tipoServico;
         this.data = data;
         this.valor = valor;
+    }
+
+    private static void validarCampo(String campo) {
+        if (campo == null || campo.indexOf(';') >= 0 || campo.indexOf('\r') >= 0 || campo.indexOf('\n') >= 0) {
+            throw new IllegalArgumentException("Os campos não podem conter ponto e vírgula ou quebras de linha.");
+        }
     }
 
     public int getId() { return id; }

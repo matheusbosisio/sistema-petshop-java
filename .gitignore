@@ -1,0 +1,4 @@
+agendamentos_petshop.txt
+.petshop-*.tmp
+*.class
+target/
